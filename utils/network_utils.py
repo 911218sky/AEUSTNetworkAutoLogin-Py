@@ -5,6 +5,7 @@ import datetime
 from config import Config
 from bs4 import BeautifulSoup
 
+
 def ping_host(host: str) -> bool:
     ping_command = f"ping -c 1 -W 2 {host}"
     try:
@@ -27,6 +28,7 @@ def log_error(error_log_path: str, error: str) -> None:
     with open(error_log_path, "a") as log_file:
         log_file.write(log_entry)
 
+
 def log_success(login_log_path: str, message: str) -> None:
     log_entry = f"[{get_formatted_datetime()}] SUCCESS: {message}\n"
     with open(login_log_path, "a") as log_file:
@@ -38,18 +40,20 @@ def run_auto_network(config: Config) -> None:
         ping_successful = ping_host(config.ping)
         if ping_successful:
             return
-          
+
         resp = requests.get("http://www.gstatic.com/generate_204")
         resp.raise_for_status()
 
         body = resp.text
 
         if body == "":
+            log_error(config.error_log_path, "Empty response from server")
             return
 
         regex = re.compile(r'window\.location\s*=\s*"([^"]+)";')
         match = regex.search(body)
         if not match or len(match.groups()) < 1:
+            log_error(config.error_log_path, "Login URL not found")
             return
         login_url = match.group(1)
 
@@ -60,6 +64,7 @@ def run_auto_network(config: Config) -> None:
         magic = soup.select_one('input[type=hidden]:nth-child(1)').get('value')
 
         if magic == "":
+            log_error(config.error_log_path, "Magic value not found")
             return
 
         payload = {
@@ -78,11 +83,12 @@ def run_auto_network(config: Config) -> None:
 
         resp = requests.post("https://fg.aeust.edu.tw:1442/",
                              data=payload, headers=headers)
-        
+
         resp.raise_for_status()
 
         if resp.status_code == 200:
-            log_success(config.login_log_path, "Login successful " + config["username"])
+            log_success(config.login_log_path,
+                        "Login successful " + config["username"])
 
     except Exception as e:
         log_error(config.error_log_path, e)

@@ -86,12 +86,8 @@ def run_auto_network(config: Config) -> None:
 
         resp.raise_for_status()
 
-        if resp.status_code == 200:
-            log_success(config.login_log_path,
-                        "Login successful " + config["username"])
-        else:
-            print("Login failed " + config["username"])
-            log_error(config.error_log_path, "Login failed")
+        log_success(config.login_log_path,
+                    "Login successful " + config["username"])
 
     except Exception as e:
         log_error(config.error_log_path, e)

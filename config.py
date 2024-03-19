@@ -25,7 +25,7 @@ def read_config(config_file_path: str) -> Optional[Config]:
     return Config(ping, interval, username, password, login_log_path, error_log_path)
 
 
-def createDefaultConfig(config_file_path: str) -> None:
+def create_default_config(config_file_path: str) -> None:
     cfg = configparser.ConfigParser()
     username = input("Student ID: ")
     password = input("Password: ")

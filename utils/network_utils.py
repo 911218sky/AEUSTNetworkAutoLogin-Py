@@ -63,6 +63,9 @@ def run_auto_network(config: Config) -> None:
         soup = BeautifulSoup(body, 'html.parser')
         magic = soup.select_one('input[type=hidden]:nth-child(1)').get('value')
 
+        log_success(config.login_log_path,
+                    "Login successful " + config["username"])
+
         if magic == "":
             log_error(config.error_log_path, "Magic value not found")
             return
@@ -83,11 +86,7 @@ def run_auto_network(config: Config) -> None:
 
         resp = requests.post("https://fg.aeust.edu.tw:1442/",
                              data=payload, headers=headers)
-
-        resp.raise_for_status()
-
-        log_success(config.login_log_path,
-                    "Login successful " + config["username"])
+        
 
     except Exception as e:
         log_error(config.error_log_path, e)
